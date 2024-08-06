@@ -1,8 +1,7 @@
-import threading
 import time
 import random
-import uuid
 from datetime import datetime, timezone
+from confluent_kafka import Producer
 
 class FinancialTransaction:
     def __init__(self, transaction_id, timestamp, amount, currency, sender_account_id, receiver_account_id):
@@ -30,20 +29,27 @@ def generate_dummy_transaction(transaction_id):
     return FinancialTransaction(transaction_id, timestamp, amount, currency, sender_account_id, receiver_account_id)
 
 
-def transaction_producer():
-    transaction_id = 1
-    while True:
-        transaction = generate_dummy_transaction(transaction_id)
-        print(transaction)
-        transaction_id += 1
-        time.sleep(1)
-
-
-background_thread = threading.Thread(target=transaction_producer, daemon=True)
+def delivery_report(err, msg):
+    if err is not None:
+        print('Message delivery failed: {}'.format(err))
+    else:
+        print('Message delivered to {} [{}]'.format(msg.topic(), msg.value()))
 
 
 def run():
-    background_thread.start()
+    producer = Producer({
+        'bootstrap.servers': 'localhost:9092'
+    })
 
-    while True:
-        pass
+    try:
+        transaction_id = 1
+        while True:
+            transaction = generate_dummy_transaction(transaction_id)
+            producer.produce('transaction', str(transaction), callback=delivery_report)
+            producer.poll(0)
+            transaction_id += 1
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print()
+    finally:
+        producer.flush()
