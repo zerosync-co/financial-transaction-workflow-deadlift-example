@@ -1,0 +1,18 @@
+[package]
+name = "receive-tx-module"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+lto = true
+strip = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+chrono = { version = "0.4.38", features = ["serde"] }
+extism-pdk = "1.2.0"
+serde = "1.0.204"
+serde_json = "1.0.122"
+uuid = "1.10.0"
