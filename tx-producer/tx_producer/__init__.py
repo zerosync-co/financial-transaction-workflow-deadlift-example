@@ -38,7 +38,7 @@ def delivery_report(err, msg):
 
 def run():
     producer = Producer({
-        'bootstrap.servers': 'localhost:9092'
+        'bootstrap.servers': 'kafka:9092'
     })
 
     try:

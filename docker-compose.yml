@@ -50,3 +50,8 @@ services:
     environment:
       - ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_BROKER=kafka:9092
+  tx-producer:
+    build: ./tx-producer
+    container_name: tx-producer
+    links:
+      - kafka
